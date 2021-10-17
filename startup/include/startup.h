@@ -1,19 +1,18 @@
 #ifndef _STARTUP_H
 #define _STARTUP_H
 
-
-#define EXPORTED __declspec(dllexport)
+#include "../../core/include/HttpInterface.h"
+#include "export.h"
 
 #ifdef __cplusplus
 extern "C"
 {
-#endif // __cplusplus
+#endif
 
-EXPORTED int startup(void* pArg);
+DLLEXPORTED void Startup(HttpInterface& httpInterface);
 
 #ifdef __cplusplus
 }
-#endif // __cplusplus
-
+#endif
 
 #endif // !_STARTUP_H

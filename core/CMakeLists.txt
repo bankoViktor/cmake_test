@@ -1,10 +1,7 @@
+﻿cmake_minimum_required (VERSION 3.8)
 
-cmake_minimum_required (VERSION 3.8)
+project(core)
 
-project ("core")
+file(GLOB CORE_SOURCE "src/*.cpp" "include/*.h")
 
-set( SOURCE_LIB 
-	"src/startup.cpp"
-)		
-
-add_library(core_lib SHARED ${SOURCE_LIB})
+add_library (core SHARED ${CORE_SOURCE})
