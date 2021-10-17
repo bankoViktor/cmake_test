@@ -6,11 +6,13 @@
 void Startup(HttpInterface& httpInterface)
 {
 	httpInterface.on(HttpMethods::Get, "/", [](const HttpRequest& req, HttpResponse& resp)
-	{
-			std::cout << "/" << std::endl;
-	});
+		{
+			std::cout << req.m_pszMethod << "   " << req.m_pszUri << std::endl;
+		}
+	);
 	httpInterface.get("/index", [](const HttpRequest& req, HttpResponse& resp)
-	{
-		std::cout << "/index" << std::endl;
-	});
+		{
+			std::cout << req.m_pszMethod << "   " << req.m_pszUri << "     " << " index page content " << std::endl;
+		}
+	);
 }

@@ -8,10 +8,10 @@
 #include <algorithm>
 
 HttpInterface::HttpInterface() :
-	m_status(0),
-	m_port(0),
+	m_dwPort(DEFAULT_PORT),
 	m_socket(INVALID_SOCKET)
 {
+	m_pRequestHandlers = new std::vector<REQUEST_HANDLER_INFO>();
 }
 
 HttpInterface::~HttpInterface()
@@ -21,18 +21,20 @@ HttpInterface::~HttpInterface()
 		WinSock::CloseSocket(m_socket);
 		m_socket = INVALID_SOCKET;
 	}
+
+	SafeReleasePonter(m_pRequestHandlers);
 }
 
-void HttpInterface::Start(int port)
+void HttpInterface::Start(unsigned short dwPort)
 {
 	SOCKET socket = INVALID_SOCKET;
-	if (!WinSock::CreateSocket(&socket, port))
+	if (!WinSock::CreateSocket(&socket, dwPort))
 	{
 		std::cout << "WinSock::CreateSocket failed " << WSAGetLastError() << std::endl;
 		return;
 	}
 
-	m_port = port;
+	m_dwPort = dwPort;
 	m_socket = socket;
 
 	std::thread acceptionThread{ &HttpInterface::AcceptingHandler, this };
@@ -64,82 +66,6 @@ void HttpInterface::AcceptingHandler()
 	}
 }
 
-bool compareChar(char& c1, char& c2)
-{
-	if (c1 == c2)
-		return true;
-	else if (std::toupper(c1) == std::toupper(c2))
-		return true;
-	return false;
-}
-/*
- * Case Insensitive String Comparision
- */
-bool caseInSensStringCompare(std::string& str1, std::string& str2)
-{
-	return ((str1.size() == str2.size()) &&
-		std::equal(str1.begin(), str1.end(), str2.begin(), &compareChar));
-}
-
-inline void to_upper(std::string& str) 
-{
-	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
-}
-
-inline void to_lower(std::string& str)
-{
-	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-}
-
-inline void ltrim(std::string& str)
-{
-	str.erase(0, str.find_first_not_of(" \r\n\t"));
-}
-
-size_t parse(std::string& out, const std::string& content, const char* target, size_t offset, int verb = 0)
-{
-	auto pos = content.find(target, offset);
-	auto fragment = content.substr(offset, pos - offset);
-
-	if (verb < 0)
-		to_lower(fragment);
-	else if (verb > 0)
-		to_upper(fragment);
-
-	out = fragment;
-	return pos + strlen(target);
-}
-
-bool HttpInterface::ParseRequest(
-	const std::string& content,
-	size_t end,
-	std::string& method,
-	std::string& uri,
-	std::string& protocolName,
-	std::string& protocolVersion,
-	HttpHeaderCollection& headers)
-{
-	size_t pos = 0;
-
-	pos = parse(method, content, " ", pos, 1);
-	pos = parse(uri, content, " ", pos, -1);
-	pos = parse(protocolName, content, "/", pos, +1);
-	pos = parse(protocolVersion, content, "\r\n", pos);
-
-	// Headers
-	std::string header, value;
-	while (pos < end)
-	{
-		pos = parse(header, content, ":", pos);
-		to_lower(header);
-		pos = parse(value, content, "\r\n", pos);
-		ltrim(value);
-		headers.insert(std::pair<std::string, std::string>(header, value));
-	}
-
-	return true;
-}
-
 void HttpInterface::RequestHandler(SOCKET clientSocket)
 {
 	std::cout << "Request from 0x" << std::setw(8) << std::setfill('0') << std::hex << clientSocket << std::endl;
@@ -168,11 +94,19 @@ void HttpInterface::RequestHandler(SOCKET clientSocket)
 		if (pos == std::string::npos)
 		{
 			pos = content.find("\r\n\r\n");
-			if (pos != std::string::npos)
+			if (pos != std::string::npos &&
+				HttpRequest::Parse(content, pos, method, uri, protocolName, protocolVersion, headers))
 			{
-				ParseRequest(content, pos, method, uri, protocolName, protocolVersion, headers);
-				contentLength = std::stoll(headers["content-length"]);
-				pos += 4;
+				auto pContentLengthHeader = headers["content-length"];
+				if (pContentLengthHeader) 
+				{
+					contentLength = pContentLengthHeader->asLongLong();
+					pos += 4;
+				}
+				else 
+				{
+					break;
+				}
 			}
 		} 
 
@@ -187,21 +121,20 @@ void HttpInterface::RequestHandler(SOCKET clientSocket)
 	}
 
 	HttpRequest request(method, uri, protocolName, protocolVersion, headers, content, pos, contentLength);
+	HttpResponse response(request);
 
-	//HttpResponse response(request);
+	auto it = m_pRequestHandlers->cbegin();
+	while (it != m_pRequestHandlers->cend())
+	{
+		if (StringCompare(it->pszMethod, request.m_pszMethod, true) && 
+			StringCompare(it->pszResource, request.m_pszUri, true))
+		{
+			it->handler(request, response);
+			break;
+		}
 
-	//const char* resource = "/Index";
-
-	//for (int i = 0; i < m_requestHandlers.size(); ++i)
-	//{
-	//	std::string a = m_requestHandlers[i].pszResource;
-	//	std::string b = resource;
-	//	if (caseInSensStringCompare(a, b))
-	//	{
-	//		m_requestHandlers[i].handler(request, response);
-	//		break;
-	//	}
-	//}
+		++it;
+	}
 }
 
 HttpInterface& HttpInterface::on(const char* pszMethod, const char* pszResource, REQUEST_HANDLER handler)
@@ -211,7 +144,7 @@ HttpInterface& HttpInterface::on(const char* pszMethod, const char* pszResource,
 	reqHandlerInfo.pszMethod = pszMethod;
 	reqHandlerInfo.pszResource = pszResource;
 	reqHandlerInfo.handler = handler;
-	m_requestHandlers.push_back(reqHandlerInfo);
+	m_pRequestHandlers->push_back(reqHandlerInfo);
 	return *this;
 }
 
@@ -223,10 +156,4 @@ HttpInterface& HttpInterface::get(const char* pszResource, REQUEST_HANDLER handl
 HttpInterface& HttpInterface::post(const char* pszResource, REQUEST_HANDLER handler)
 {
 	return on(HttpMethods::Post, pszResource, handler);
-}
-
-bool HttpInterface::Receive(SOCKET socket, std::string& data)
-{
-	
-	return true;
 }

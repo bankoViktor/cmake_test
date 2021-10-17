@@ -5,11 +5,13 @@
 #include "HttpRequest.h"
 #include "HttpResponse.h"
 #include "export.h"
+#include "Utils.h"
 #include <vector>
-#include <sstream>
+
+#define DEFAULT_PORT	80
 
 
-typedef void (*REQUEST_HANDLER)(const HttpRequest& request, HttpResponse& response);
+typedef void (*REQUEST_HANDLER)(const HttpRequest& req, HttpResponse& resp);
 
 
 typedef struct _REQUEST_HANDLER_INFO
@@ -23,32 +25,21 @@ typedef struct _REQUEST_HANDLER_INFO
 class DLLEXPORTED HttpInterface
 {
 private:
-	int m_status;
-	int m_port;
+	unsigned short m_dwPort;
 	SOCKET m_socket;
+	std::vector<REQUEST_HANDLER_INFO>* m_pRequestHandlers;
+
+private:
 	void AcceptingHandler();
 	void RequestHandler(SOCKET clientSocket);
-	std::vector<REQUEST_HANDLER_INFO> m_requestHandlers;
 
 public:
 	HttpInterface();
 	~HttpInterface();
-	void Start(int port);
-
+	void Start(unsigned short dwPort);
 	HttpInterface& on(const char* pszMethod, const char* pszResource, REQUEST_HANDLER handler);
 	HttpInterface& get(const char* pszResource, REQUEST_HANDLER handler);
 	HttpInterface& post(const char* pszResource, REQUEST_HANDLER handler);
-
-private:
-	bool Receive(SOCKET socket, std::string& data);
-	bool ParseRequest(
-		const std::string& content,
-		size_t end,
-		std::string& method,
-		std::string& uri,
-		std::string& protocolName,
-		std::string& protocolVersion,
-		HttpHeaderCollection& headers);
 };
 
 

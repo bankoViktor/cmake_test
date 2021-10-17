@@ -4,20 +4,21 @@
 #include "export.h"
 #include <string>
 #include <map>
+#include "HttpHeaderCollection.h"
+#include "Utils.h"
 
-typedef std::map<std::string, std::string> HttpHeaderCollection;
 
 class DLLEXPORTED HttpRequest
 {
 private:
-	std::string m_body;
+	char * m_pszBody;
 
 public:
-	std::string m_method;
-	std::string m_uri;
-	std::string m_protocolName;
-	std::string m_protocolVersion;
-	HttpHeaderCollection m_headers;
+	char * m_pszMethod;
+	char * m_pszUri;
+	char * m_pszProtocolName;
+	char * m_pszProtocolVersion;
+	HttpHeaderCollection* m_pHeaders;
 
 public:
 	HttpRequest(
@@ -29,6 +30,25 @@ public:
 		const std::string &content,
 		size_t body_begin,
 		size_t contentLen);
+	~HttpRequest();
+
+	static bool Parse(
+		const std::string& content,
+		size_t end,
+		std::string& method,
+		std::string& uri,
+		std::string& protocolName,
+		std::string& protocolVersion,
+		HttpHeaderCollection& headers);
+
+private:
+	static size_t ParseItem(
+		std::string& out,
+		const std::string& content,
+		const char* target,
+		size_t offset,
+		int verb = 0);
 };
+
 
 #endif // !_HTTP_REQUEST_H

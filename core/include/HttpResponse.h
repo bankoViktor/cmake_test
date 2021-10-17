@@ -7,10 +7,11 @@
 class DLLEXPORTED HttpResponse
 {
 private:
-	const HttpRequest &m_pRequest;
+	const HttpRequest* m_pRequest;
 
 public:
 	HttpResponse(const HttpRequest &request);
+	~HttpResponse();
 };
 
 #endif // !_HTTP_RESPONSE_H
