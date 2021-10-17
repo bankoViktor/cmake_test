@@ -6,6 +6,7 @@
 #include "HttpResponse.h"
 #include "export.h"
 #include <vector>
+#include <sstream>
 
 
 typedef void (*REQUEST_HANDLER)(const HttpRequest& request, HttpResponse& response);
@@ -37,6 +38,17 @@ public:
 	HttpInterface& on(const char* pszMethod, const char* pszResource, REQUEST_HANDLER handler);
 	HttpInterface& get(const char* pszResource, REQUEST_HANDLER handler);
 	HttpInterface& post(const char* pszResource, REQUEST_HANDLER handler);
+
+private:
+	bool Receive(SOCKET socket, std::string& data);
+	bool ParseRequest(
+		const std::string& content,
+		size_t end,
+		std::string& method,
+		std::string& uri,
+		std::string& protocolName,
+		std::string& protocolVersion,
+		HttpHeaderCollection& headers);
 };
 
 

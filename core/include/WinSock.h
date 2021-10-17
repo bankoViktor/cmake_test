@@ -3,6 +3,9 @@
 
 #include <WinSock2.h>
 #include "export.h"
+#include <sstream>
+
+#define RX_BUFFER_SIZE		512 * 1 // 512KB
 
 class DLLEXPORTED WinSock
 {
@@ -17,7 +20,10 @@ public:
 	static bool CloseSocket(SOCKET socket);
 	static SOCKET Accept(SOCKET socket, SOCKET* pClientSocket);
 
-	//static void Receive();
+	// HTTP кодировка		ISO-8859-1
+	// HTTP кодировка тела	Content-Type или ISO-8859-1
+
+	static bool Receive(SOCKET socket, std::string& received);
 	//static void Transmit(const char* data, size_t size);
 };
 

@@ -20,7 +20,7 @@ void Server::Run()
 	HMODULE hModule = LoadLibraryA(pszStartupLibraryName);
 	if (!hModule)
 	{
-		std::cout << "Startup loading failed" << std::endl;
+		std::cout << "The startup dynamic library '" << pszStartupLibraryName << "' not found." << std::endl;
 		return;
 	}
 

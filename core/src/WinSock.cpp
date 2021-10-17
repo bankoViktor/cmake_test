@@ -117,3 +117,30 @@ SOCKET WinSock::Accept(SOCKET socket, SOCKET *pClientSocket)
 
 	return true;
 }
+
+bool WinSock::Receive(SOCKET socket, std::string& received)
+{
+	char buffer[RX_BUFFER_SIZE + 1];
+
+	int receivedBytes = recv(socket, buffer, RX_BUFFER_SIZE, NULL);
+	if (receivedBytes > 0)
+	{
+		// Received
+		buffer[receivedBytes] = '\0';
+		received = buffer;
+	}
+	else
+	{
+		if (receivedBytes == 0)
+		{
+			// Connenction Closed
+		}
+		else
+		{
+			// Error
+			return false;
+		}
+	}
+
+	return true;
+}
