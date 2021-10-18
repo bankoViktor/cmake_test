@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-DLLEXPORTED void Startup(HttpInterface& httpInterface);
+DLLEXPORTED void Startup(HttpInterfaceConfigurator& config);
 
 #ifdef __cplusplus
 }

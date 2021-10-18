@@ -1,5 +1,7 @@
-#include "../include/HttpInterface.h"
 #include "../include/WinSock.h"
+#include "../include/HttpInterface.h"
+#include "../include/HttpRequest.h"
+#include "../include/HttpResponse.h"
 #include <iostream>
 #include <thread>
 #include <sstream>
@@ -7,11 +9,11 @@
 #include <string>
 #include <algorithm>
 
-HttpInterface::HttpInterface() :
+HttpInterface::HttpInterface(const HttpInterfaceConfigurator& configurator) :
 	m_dwPort(DEFAULT_PORT),
 	m_socket(INVALID_SOCKET)
 {
-	m_pRequestHandlers = new std::vector<REQUEST_HANDLER_INFO>();
+	m_pRequestHandlers = new HttpHandlerCollection();
 }
 
 HttpInterface::~HttpInterface()
@@ -75,7 +77,7 @@ void HttpInterface::RequestHandler(SOCKET clientSocket)
 	size_t pos = std::string::npos;
 	size_t contentLength = 0;
 
-	while (1)
+	while (true)
 	{
 		if (!WinSock::Receive(clientSocket, received))
 		{
@@ -137,23 +139,3 @@ void HttpInterface::RequestHandler(SOCKET clientSocket)
 	}
 }
 
-HttpInterface& HttpInterface::on(const char* pszMethod, const char* pszResource, REQUEST_HANDLER handler)
-{
-	REQUEST_HANDLER_INFO reqHandlerInfo;
-	ZeroMemory(&reqHandlerInfo, sizeof(reqHandlerInfo));
-	reqHandlerInfo.pszMethod = pszMethod;
-	reqHandlerInfo.pszResource = pszResource;
-	reqHandlerInfo.handler = handler;
-	m_pRequestHandlers->push_back(reqHandlerInfo);
-	return *this;
-}
-
-HttpInterface& HttpInterface::get(const char* pszResource, REQUEST_HANDLER handler)
-{
-	return on(HttpMethods::Get, pszResource, handler);
-}
-
-HttpInterface& HttpInterface::post(const char* pszResource, REQUEST_HANDLER handler)
-{
-	return on(HttpMethods::Post, pszResource, handler);
-}

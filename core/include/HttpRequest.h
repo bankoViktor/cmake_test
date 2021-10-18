@@ -3,31 +3,28 @@
 
 #include "export.h"
 #include <string>
-#include <map>
-#include "HttpHeaderCollection.h"
 #include "Utils.h"
+#include "HttpHeaderCollection.h"
 
 
 class DLLEXPORTED HttpRequest
 {
-private:
-	char * m_pszBody;
-
 public:
-	char * m_pszMethod;
-	char * m_pszUri;
-	char * m_pszProtocolName;
-	char * m_pszProtocolVersion;
+	const char * m_pszMethod;
+	const char * m_pszUri;
+	const char * m_pszProtocolName;
+	const char * m_pszProtocolVersion;
 	HttpHeaderCollection* m_pHeaders;
+	const char* m_pszBody;
 
 public:
 	HttpRequest(
-		const std::string &method, 
-		const std::string &uri,
-		const std::string &protocolName,
-		const std::string &protocolVersion,
-		const HttpHeaderCollection &headers,
-		const std::string &content,
+		const std::string& method,
+		const std::string& uri,
+		const std::string& protocolName,
+		const std::string& protocolVersion,
+		const HttpHeaderCollection& headers,
+		const std::string& content,
 		size_t body_begin,
 		size_t contentLen);
 	~HttpRequest();

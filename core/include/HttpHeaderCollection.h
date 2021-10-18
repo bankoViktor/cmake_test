@@ -2,34 +2,21 @@
 #define _HTTP_HEADER_COLLECTION_H
 
 #include "export.h"
-#include <string>
 #include <vector>
-#include <algorithm>
-
-
-class DLLEXPORTED HttpHeader
-{
-public:
-	std::string *name;
-	std::string *value;
-
-public:
-	HttpHeader(const std::string &name, const std::string &value);
-	~HttpHeader();
-	long long asLongLong() const;
-};
+#include "HttpHeader.h"
 
 
 class DLLEXPORTED HttpHeaderCollection
 {
 private:
-	std::vector<const HttpHeader*> *m_pCollection;
+	std::vector<HttpHeader*> *m_pHeaders;
 
 public:
 	HttpHeaderCollection();
 	HttpHeaderCollection(const HttpHeaderCollection& copy);
 	~HttpHeaderCollection();
-	void Add(const std::string& name, const std::string& value);
+	void AddHeader(const HttpHeader& header);
+	void AddHeader(const char* name, const char* value);
 	const HttpHeader* operator[](const char* name);
 };
 

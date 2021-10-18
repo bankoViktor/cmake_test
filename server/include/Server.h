@@ -2,13 +2,14 @@
 #define _SERVER_H
 
 #include "../../core/include/HttpInterface.h"
+#include "../../core/include/HttpInterfaceConfigurator.h"
 
-typedef void (*STARTUPPROC)(HttpInterface& httpInterface);
+typedef void (*STARTUPPROC)(HttpInterfaceConfigurator& httpInterface);
 
 class Server
 {
 private:
-	HttpInterface m_httpInterface;
+	HttpInterface *m_pHttpInterface;
 
 public:
 	Server();

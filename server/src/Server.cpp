@@ -1,14 +1,19 @@
 #include "../include/Server.h"
 #include "../../core/include/WinSock.h"
 #include <iostream>
+#include "../../core/include/HttpInterfaceConfigurator.h"
 
 Server::Server()
 {
 	WinSock::Initialization();
+
+	m_pHttpInterface = nullptr;
 }
 
 Server::~Server()
 {
+	SafeReleasePonter(m_pHttpInterface);
+
 	WinSock::Uninitialization();
 }
 
@@ -27,13 +32,17 @@ void Server::Run()
 	STARTUPPROC srartupProc = (STARTUPPROC)GetProcAddress(hModule, "Startup");
 	if (!srartupProc)
 	{
-		std::cout << "The 'void startup(HttpInterface&)' function in '" << pszStartupLibraryName << "' not found." << std::endl;
+		std::cout << "The startup function in '" << pszStartupLibraryName << "' not found." << std::endl;
 		return;
 	}
 
-	srartupProc(m_httpInterface);
+	HttpInterfaceConfigurator configurator;
 
-	m_httpInterface.Start(dwPort);
+	srartupProc(configurator);
+
+	m_pHttpInterface = new HttpInterface(configurator);
+
+	m_pHttpInterface->Start(dwPort);
 
 	std::cout << "Started on port " << dwPort << std::endl;
 

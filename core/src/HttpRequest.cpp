@@ -1,6 +1,7 @@
 #include "../include/HttpRequest.h"
 #include "../include/Utils.h"
 
+
 HttpRequest::HttpRequest(
 	const std::string& method,
 	const std::string& uri,
@@ -11,29 +12,32 @@ HttpRequest::HttpRequest(
 	size_t body_begin,
 	size_t contentLen)
 {
-	auto methodLen = method.size() + 1;
-	m_pszMethod = new char[methodLen];
-	strcpy_s(m_pszMethod, methodLen, method.data());
+	size_t len;
 
-	auto uriLen = uri.size() + 1;
-	m_pszUri = new char[uriLen];
-	strcpy_s(m_pszUri, uriLen, uri.data());
+	len = method.size() + 1;
+	m_pszMethod = new char[len];
+	strcpy_s((char*)m_pszMethod, len, method.data());
 
-	auto protocolNameLen = protocolName.size() + 1;
-	m_pszProtocolName = new char[protocolNameLen];
-	strcpy_s(m_pszProtocolName, protocolNameLen, protocolName.data());
+	len = uri.size() + 1;
+	m_pszUri = new char[len];
+	strcpy_s((char*)m_pszUri, len, uri.data());
 
-	auto protocolVersionLen = protocolName.size() + 1;
-	m_pszProtocolVersion = new char[protocolVersionLen];
-	strcpy_s(m_pszProtocolVersion, protocolVersionLen, protocolVersion.data());
+	len = protocolName.size() + 1;
+	m_pszProtocolName = new char[len];
+	strcpy_s((char*)m_pszProtocolName, len, protocolName.data());
+
+	len = protocolName.size() + 1;
+	m_pszProtocolVersion = new char[len];
+	strcpy_s((char*)m_pszProtocolVersion, len, protocolVersion.data());
 
 	m_pHeaders = new HttpHeaderCollection();
 
 	m_pszBody = nullptr;
 	if (contentLen > 0)
 	{
-		m_pszBody = new char[contentLen]; 
-		strcpy_s(m_pszBody, contentLen,  protocolVersion.data() + body_begin);
+		len = contentLen + 1;
+		m_pszBody = new char[len];
+		strcpy_s((char*)m_pszBody, len,  protocolVersion.data() + body_begin);
 	}
 }
 
@@ -90,7 +94,8 @@ bool HttpRequest::Parse(
 		ToLower(header);
 		pos = ParseItem(value, content, "\r\n", pos);
 		LeftTrim(value);
-		headers.Add(header, value);
+		auto hrd = new HttpHeader(header, value);
+		headers.AddHeader(*hrd);
 	}
 
 	return true;
