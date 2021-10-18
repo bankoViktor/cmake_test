@@ -30,7 +30,7 @@ HttpRequest::HttpRequest(
 	m_pszProtocolVersion = new char[len];
 	strcpy_s((char*)m_pszProtocolVersion, len, protocolVersion.data());
 
-	m_pHeaders = new HttpHeaderCollection();
+	m_pHeaders = new HttpHeaderCollection(headers);
 
 	m_pszBody = nullptr;
 	if (contentLen > 0)

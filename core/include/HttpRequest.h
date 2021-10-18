@@ -28,7 +28,6 @@ public:
 		size_t body_begin,
 		size_t contentLen);
 	~HttpRequest();
-
 	static bool Parse(
 		const std::string& content,
 		size_t end,
