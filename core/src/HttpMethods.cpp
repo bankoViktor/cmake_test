@@ -1,5 +1,6 @@
 #include "..\include\HttpMethods.h"
 
+
 const char* HttpHelper::TranslateMethods(HttpMethods method)
 {
 	switch (method)

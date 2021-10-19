@@ -5,6 +5,7 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
+
 WSADATA* WinSock::m_pWsaData = nullptr;
 
 bool WinSock::Initialization()

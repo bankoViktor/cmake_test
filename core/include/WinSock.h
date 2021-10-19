@@ -5,7 +5,9 @@
 #include "export.h"
 #include <sstream>
 
+
 #define RX_BUFFER_SIZE		512 * 1 // 512KB
+
 
 class DLLEXPORTED WinSock
 {
@@ -26,5 +28,6 @@ public:
 	static bool Receive(SOCKET socket, std::string& received);
 	//static void Transmit(const char* data, size_t size);
 };
+
 
 #endif // _WINSOCK_H

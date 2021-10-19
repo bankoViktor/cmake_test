@@ -1,5 +1,6 @@
 #include "../include/HttpInterfaceConfigurator.h"
 
+
 HttpInterfaceConfigurator::HttpInterfaceConfigurator()
 {
 	m_pRequestHandlers = nullptr;

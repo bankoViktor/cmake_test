@@ -5,6 +5,7 @@
 #include "types.h"
 #include "HttpMethods.h"
 
+
 class DLLEXPORTED HttpInterfaceConfigurator
 {
 public:

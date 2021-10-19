@@ -1,6 +1,7 @@
 #include "../include/Utils.h"
 #include <algorithm>
 
+
 bool StringCompare(const char* a, const char* b, bool caseInsensitive)
 {
 	size_t la = strlen(a);

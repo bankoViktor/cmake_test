@@ -9,6 +9,7 @@
 #include <string>
 #include <algorithm>
 
+
 HttpInterface::HttpInterface(const HttpInterfaceConfigurator& configurator) :
 	m_dwPort(DEFAULT_PORT),
 	m_socket(INVALID_SOCKET)
@@ -136,4 +137,3 @@ void HttpInterface::RequestHandler(SOCKET clientSocket)
 		++it;
 	}
 }
-

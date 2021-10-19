@@ -2,6 +2,7 @@
 #include "../../core/include/HttpInterface.h"
 #include <iostream>
 
+
 void indexWithRouteParamHandler(const HttpRequest& req, HttpResponse& resp)
 {
 	std::cout << req.m_sMethod << "   " << req.m_sUri << "     " << " index page content " << std::endl;
@@ -13,6 +14,9 @@ void Startup(HttpInterfaceConfigurator& config)
 	config.on(HttpMethods::Get, "/", [](const HttpRequest& req, HttpResponse& resp)
 		{
 			std::cout << req.m_sMethod << "   " << req.m_sUri << std::endl;
+
+			resp.Write("<!DOCTYPE><html lang=\"en\"><head><title>Test page</title></head><body><h2>Test page</h2><body></html>");
+
 		}
 	);
 
