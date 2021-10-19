@@ -3,7 +3,7 @@
 
 #include "export.h"
 #include "types.h"
-#include "HttpMethods.h"
+#include "HttpRequest.h"
 
 
 class DLLEXPORTED HttpInterfaceConfigurator

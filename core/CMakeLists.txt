@@ -2,8 +2,6 @@
 
 project(core)
 
-
-
 add_library (core SHARED
 	"src/WinSock.cpp"
 	"src/Utils.cpp"
@@ -13,8 +11,8 @@ add_library (core SHARED
 	"src/HttpResponse.cpp"
 	"src/HttpHeader.cpp"
 	"src/HttpHeaderCollection.cpp"
-	"src/HttpMethods.cpp"
-)
+	
+ )
 
 target_compile_options (core PRIVATE 
 	/std:c++20

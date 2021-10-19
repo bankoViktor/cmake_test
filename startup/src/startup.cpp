@@ -13,17 +13,14 @@ void Startup(HttpInterfaceConfigurator& config)
 	// ѕр€мое указани€ стандартного метода HTTP
 	config.on(HttpMethods::Get, "/", [](const HttpRequest& req, HttpResponse& resp)
 		{
-			std::cout << req.m_sMethod << "   " << req.m_sUri << std::endl;
-
 			resp.Write("<!DOCTYPE><html lang=\"en\"><head><title>Test page</title></head><body><h2>Test page</h2><body></html>");
-
 		}
 	);
 
 	// ѕользовательский метод пользовательского протокола на базе HTTP
 	config.on("MAKE", "/", [](const HttpRequest& req, HttpResponse& resp)
 		{
-			std::cout << req.m_sMethod << "   " << req.m_sUri << std::endl;
+			std::cout << "make" << std::endl;
 		}
 	);
 

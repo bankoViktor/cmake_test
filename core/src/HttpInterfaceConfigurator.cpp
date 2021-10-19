@@ -27,7 +27,7 @@ HttpInterfaceConfigurator& HttpInterfaceConfigurator::on(const char* pszMethod, 
 
 HttpInterfaceConfigurator& HttpInterfaceConfigurator::on(HttpMethods method, const char* pszResource, REQUEST_HANDLER handler)
 {
-	auto szMmethod = HttpHelper::TranslateMethods(method);
+	auto szMmethod = HttpRequest::TranslateMethod(method);
 	return on(szMmethod, pszResource, handler);
 }
 

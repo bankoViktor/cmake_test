@@ -42,7 +42,8 @@
   <Type Name="HttpResponse">
     <DisplayString>{{ Response }}</DisplayString>
     <Expand>
-      <Item Name="[ request ]">m_pRequest</Item>
+      <Item Name="[ request ]">m_request</Item>
+      <Item Name="[ status ]">m_nStatusCode</Item>
     </Expand>
   </Type>
   

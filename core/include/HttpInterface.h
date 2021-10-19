@@ -20,6 +20,17 @@ private:
 private:
 	void AcceptingHandler();
 	void RequestHandler(SOCKET clientSocket);
+	bool Receive(
+		SOCKET socket,
+		HttpHeaderCollection& headers,
+		std::string& method,
+		std::string& uri,
+		std::string& protocolName,
+		std::string& protocolVersion,
+		std::string& body);
+	bool Transmit(
+		SOCKET socket,
+		const HttpResponse& response);
 
 public:
 	HttpInterface(const HttpInterfaceConfigurator& configurator);

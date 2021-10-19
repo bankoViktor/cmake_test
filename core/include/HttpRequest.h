@@ -7,6 +7,20 @@
 #include "HttpHeaderCollection.h"
 
 
+typedef enum class _HttpMethods
+{
+	Get,
+	Head,
+	Post,
+	Put,
+	Delete,
+	Connect,
+	Options,
+	Trace,
+	Patch,
+} HttpMethods;
+
+
 class DLLEXPORTED HttpRequest
 {
 public:
@@ -33,6 +47,7 @@ public:
 		std::string& protocolName,
 		std::string& protocolVersion,
 		HttpHeaderCollection& headers);
+	static const char* TranslateMethod(HttpMethods method);
 
 private:
 	static size_t ParseItem(

@@ -71,20 +71,60 @@ void HttpInterface::AcceptingHandler()
 
 void HttpInterface::RequestHandler(SOCKET clientSocket)
 {
-	std::cout << "Request from 0x" << std::setw(8) << std::setfill('0') << std::hex << clientSocket << std::endl;
-
-	std::string received, content, method, uri, protocolName, protocolVersion;
+	std::string content, method, uri, protocolName, protocolVersion;
 	HttpHeaderCollection headers;
+
+	if (!Receive(clientSocket, headers, method, uri, protocolName, protocolVersion, content)) return;
+
+	HttpRequest request(headers, method, uri, protocolName, protocolVersion, content);
+	HttpResponse response(request);
+
+	auto it = m_pRequestHandlers->cbegin();
+	while (it != m_pRequestHandlers->cend())
+	{
+		if (StringCompare(it->pszMethod, request.m_sMethod.c_str(), true) && 
+			StringCompare(it->pszResource, request.m_sUri.data(), true))
+		{
+			it->handler(request, response);
+			break;
+		}
+		++it;
+	}
+
+	//if (!Transmit(clientSocket, response)) return;
+
+	std::cout 
+		<< std::setfill('.') 
+		<< std::setw(4) << std::right << clientSocket << ' '
+		<< std::setw(10) << std::left << request.m_sMethod << ' '
+		<< std::setw(80) << request.m_sUri << ' '
+		<< std::setw(3) << response.GetStatusCode() << ' '
+		<< std::setw(18) << std::left << HttpResponse::TranslateStatusCode((HttpStatusCodes)response.GetStatusCode())
+		<< std::endl;
+}
+
+bool HttpInterface::Receive(
+	SOCKET socket,
+	HttpHeaderCollection& headers,
+	std::string& method,
+	std::string& uri,
+	std::string& protocolName,
+	std::string& protocolVersion,
+	std::string& body)
+{
+	body.clear();
+
+	std::string received, content;
 	size_t pos = std::string::npos;
 	size_t contentLength = 0;
 
 	while (true)
 	{
-		if (!WinSock::Receive(clientSocket, received))
+		if (!WinSock::Receive(socket, received))
 		{
 			std::cout << "Receive failed " << WSAGetLastError() << std::endl;
 			// Transmit Error ?
-			return;
+			return false;
 		}
 
 		content.append(received);
@@ -102,38 +142,32 @@ void HttpInterface::RequestHandler(SOCKET clientSocket)
 					contentLength = header.asLongLong();
 					pos += 4;
 				}
-				else 
+				else
 				{
-					content.clear();
 					break;
 				}
 			}
-		} 
+		}
 
-		if (contentLength > 0) 
+		if (contentLength > 0)
 		{
 			size_t loadedContentLength = content.size() - pos;
 			if (loadedContentLength >= contentLength)
 			{
-				content.erase(0, content.size() - contentLength);
+				body = content.substr(pos, loadedContentLength);
 				break;
 			}
 		}
 	}
 
-	HttpRequest request(headers, method, uri, protocolName, protocolVersion, content);
+	return true;
+}
 
-	HttpResponse response(request);
+bool HttpInterface::Transmit(
+	SOCKET socket,
+	const HttpResponse& response)
+{
+	std::cout << "Error Transmit NOT IMPLEMENTED" << std::endl;
 
-	auto it = m_pRequestHandlers->cbegin();
-	while (it != m_pRequestHandlers->cend())
-	{
-		if (StringCompare(it->pszMethod, request.m_sMethod.c_str(), true) && 
-			StringCompare(it->pszResource, request.m_sUri.data(), true))
-		{
-			it->handler(request, response);
-			break;
-		}
-		++it;
-	}
+	return false;
 }

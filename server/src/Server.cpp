@@ -45,13 +45,13 @@ void Server::Run()
 				m_pHttpInterface = new HttpInterface(configurator);
 			USING_END() // configurator free
 
+			m_pHttpInterface->Start(dwPort);
+
+			std::cout << "Started on port " << dwPort << std::endl;
+
+			while (true) {}
+
 			FreeLibrary(hModule);
 		}
 	USING_END()
-
-	m_pHttpInterface->Start(dwPort);
-
-	std::cout << "Started on port " << dwPort << std::endl;
-
-	while (true) {}
 }
