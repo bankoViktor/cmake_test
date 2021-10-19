@@ -2,7 +2,7 @@
 
 HttpInterfaceConfigurator::HttpInterfaceConfigurator()
 {
-	m_pRequestHandlers = new HttpHandlerCollection();
+	m_pRequestHandlers = nullptr;
 }
 
 HttpInterfaceConfigurator::~HttpInterfaceConfigurator()
@@ -12,17 +12,21 @@ HttpInterfaceConfigurator::~HttpInterfaceConfigurator()
 
 HttpInterfaceConfigurator& HttpInterfaceConfigurator::on(const char* pszMethod, const char* pszResource, REQUEST_HANDLER handler)
 {
+	if (!m_pRequestHandlers)
+		m_pRequestHandlers = new HttpHandlerCollection();
+
 	REQUEST_HANDLER_INFO reqHandlerInfo = { 0 };
 	reqHandlerInfo.pszMethod = pszMethod;
 	reqHandlerInfo.pszResource = pszResource;
 	reqHandlerInfo.handler = handler;
 	m_pRequestHandlers->push_back(reqHandlerInfo);
+
 	return *this;
 }
 
 HttpInterfaceConfigurator& HttpInterfaceConfigurator::on(HttpMethods method, const char* pszResource, REQUEST_HANDLER handler)
 {
-	auto szMmethod = HttpHelper::Translate(method);
+	auto szMmethod = HttpHelper::TranslateMethods(method);
 	return on(szMmethod, pszResource, handler);
 }
 

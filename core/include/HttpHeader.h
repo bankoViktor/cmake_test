@@ -16,6 +16,8 @@ public:
 	HttpHeader(const HttpHeader& copy);
 	~HttpHeader();
 	long long asLongLong() const;
+	void SetValue(const char* value);
+	const HttpHeader& operator=(const char* newValue);
 };
 
 

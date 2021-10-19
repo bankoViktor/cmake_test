@@ -7,7 +7,7 @@
 
 class DLLEXPORTED HttpInterfaceConfigurator
 {
-private:
+public:
 	HttpHandlerCollection* m_pRequestHandlers;
 
 public:

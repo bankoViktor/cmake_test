@@ -35,3 +35,18 @@ long long HttpHeader::asLongLong() const
 {
 	return std::stoll(m_pszValue);
 }
+
+void HttpHeader::SetValue(const char* value)
+{
+	SafeReleasePonter(m_pszValue);
+
+	auto len = strlen(value) + 1;
+	m_pszValue = new char[len];
+	strcpy_s((char*)m_pszValue, len, value);
+}
+
+const HttpHeader& HttpHeader::operator=(const char* newValue)
+{
+	this->SetValue(newValue);
+	return *this;
+}

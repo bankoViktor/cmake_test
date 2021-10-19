@@ -11,9 +11,7 @@ HttpHeaderCollection::HttpHeaderCollection(const HttpHeaderCollection& copy) :
 	HttpHeaderCollection()
 {
 	for (auto hdr : *copy.m_pHeaders)
-	{
 		m_pHeaders->push_back(new HttpHeader(*hdr));
-	}
 }
 
 HttpHeaderCollection::~HttpHeaderCollection()
@@ -27,9 +25,25 @@ HttpHeaderCollection::~HttpHeaderCollection()
 	SafeReleasePonter(m_pHeaders);
 }
 
+HttpHeader* HttpHeaderCollection::TryGet(const char* name) const
+{
+	auto it = m_pHeaders->cbegin();
+	while (it != m_pHeaders->cend())
+	{
+		if (StringCompare((*it)->m_pszName, name, true))
+			return *it;
+		++it;
+	}
+	return nullptr;
+}
+
 void HttpHeaderCollection::AddHeader(const HttpHeader& header)
 {
-	m_pHeaders->push_back(new HttpHeader(header));
+	auto pHeader = TryGet(header.m_pszName);
+	if (pHeader)
+		pHeader->SetValue(header.m_pszValue);
+	else
+		m_pHeaders->push_back(new HttpHeader(header));
 }
 
 void HttpHeaderCollection::AddHeader(const char* name, const char* value)
@@ -37,16 +51,12 @@ void HttpHeaderCollection::AddHeader(const char* name, const char* value)
 	m_pHeaders->push_back(new HttpHeader(name, value));
 }
 
-const HttpHeader* HttpHeaderCollection::operator[](const char* name)
+HttpHeader& HttpHeaderCollection::operator[](const char* name)
 {
-	auto it = m_pHeaders->cbegin();
-	while (it != m_pHeaders->cend())
-	{
-		if (StringCompare((*it)->m_pszName, name, true))
-			return *it;
+	return *TryGet(name);
+}
 
-		++it;
-	}
-
-	return nullptr;
+bool HttpHeaderCollection::IsContains(const char* name)
+{
+	return TryGet(name) != nullptr;
 }

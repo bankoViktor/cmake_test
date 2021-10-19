@@ -19,7 +19,7 @@ enum class HttpMethods
 class HttpHelper
 {
 public:
-	static const char* Translate(HttpMethods method);
+	static const char* TranslateMethods(HttpMethods method);
 };
 
 

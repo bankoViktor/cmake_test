@@ -3,6 +3,9 @@
 #include <iostream>
 #include "../../core/include/HttpInterfaceConfigurator.h"
 
+#define USING(obj)		{ obj;
+#define USING_END()		}
+
 Server::Server()
 {
 	WinSock::Initialization();
@@ -22,25 +25,29 @@ void Server::Run()
 	const char* pszStartupLibraryName = "startup.dll";
 	const int dwPort = 80;
 
-	HMODULE hModule = LoadLibraryA(pszStartupLibraryName);
-	if (!hModule)
-	{
-		std::cout << "The startup dynamic library '" << pszStartupLibraryName << "' not found." << std::endl;
-		return;
-	}
+	USING(HMODULE hModule = LoadLibraryA(pszStartupLibraryName))
+		if (!hModule)
+		{
+			std::cout << "The startup dynamic library '" << pszStartupLibraryName << "' not found." << std::endl;
+			return;
+		}
+		else
+		{
+			STARTUPPROC srartupProc = (STARTUPPROC)GetProcAddress(hModule, "Startup");
+			if (!srartupProc)
+			{
+				std::cout << "The startup function in '" << pszStartupLibraryName << "' not found." << std::endl;
+				return;
+			}
 
-	STARTUPPROC srartupProc = (STARTUPPROC)GetProcAddress(hModule, "Startup");
-	if (!srartupProc)
-	{
-		std::cout << "The startup function in '" << pszStartupLibraryName << "' not found." << std::endl;
-		return;
-	}
+			USING(HttpInterfaceConfigurator configurator)
+				srartupProc(configurator);
+				m_pHttpInterface = new HttpInterface(configurator);
+			USING_END() // configurator free
 
-	HttpInterfaceConfigurator configurator;
-
-	srartupProc(configurator);
-
-	m_pHttpInterface = new HttpInterface(configurator);
+			FreeLibrary(hModule);
+		}
+	USING_END()
 
 	m_pHttpInterface->Start(dwPort);
 

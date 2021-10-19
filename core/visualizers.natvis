@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  
+  <!-- NATVIS Syntax Reference https://docs.microsoft.com/ru-ru/visualstudio/debugger/create-custom-views-of-native-objects?view=vs-2019#natvis-syntax-reference -->
+  
+  <!-- Like: std::vector&lt;*&gt; -->
+  <Type Name="HttpHandlerCollection">
+    <DisplayString>{{ size={_Mypair._Myval2._Mylast - _Mypair._Myval2._Myfirst} }}</DisplayString>
+    <Expand HideRawView="true">
+      <Item Name="[capacity]" ExcludeView="simple">_Mypair._Myval2._Myend - _Mypair._Myval2._Myfirst</Item>
+      <Item Name="[allocator]" ExcludeView="simple">_Mypair</Item>
+      <ArrayItems>
+        <Size>_Mypair._Myval2._Mylast - _Mypair._Myval2._Myfirst</Size>
+        <ValuePointer>_Mypair._Myval2._Myfirst</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="HttpHeaderCollection">
+    <DisplayString>{{ count={m_pHeaders->size()} }}</DisplayString>
+  </Type>
+
+  <Type Name="_REQUEST_HANDLER_INFO">
+    <DisplayString>{{ {pszMethod,sb} {pszResource,sb} }}</DisplayString>
+  </Type>
+  
+  <Type Name="HttpHeader">
+    <DisplayString>{{ {m_pszName,s} : {m_pszValue,s} }}</DisplayString>
+  </Type>
+  
+  <Type Name="HttpRequest">
+    <DisplayString>{{ Request: {m_pszMethod,sb} {m_pszUri,sb} }}</DisplayString>
+  </Type>
+
+  <Type Name="HttpResponse">
+    <DisplayString>{{ Response }}</DisplayString>
+    <Expand>
+      <Item Name="[ request ]">m_pRequest</Item>
+    </Expand>
+  </Type>
+  
+</AutoVisualizer>

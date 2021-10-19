@@ -9,7 +9,7 @@
 typedef void (*REQUEST_HANDLER)(const HttpRequest& req, HttpResponse& resp);
 
 
-typedef struct sREQUEST_HANDLER_INFO
+typedef struct _REQUEST_HANDLER_INFO
 {
 	const char* pszMethod;
 	const char* pszResource;

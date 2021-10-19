@@ -13,7 +13,7 @@ HttpInterface::HttpInterface(const HttpInterfaceConfigurator& configurator) :
 	m_dwPort(DEFAULT_PORT),
 	m_socket(INVALID_SOCKET)
 {
-	m_pRequestHandlers = new HttpHandlerCollection();
+	m_pRequestHandlers = new HttpHandlerCollection(*configurator.m_pRequestHandlers);
 }
 
 HttpInterface::~HttpInterface()
@@ -99,10 +99,11 @@ void HttpInterface::RequestHandler(SOCKET clientSocket)
 			if (pos != std::string::npos &&
 				HttpRequest::Parse(content, pos, method, uri, protocolName, protocolVersion, headers))
 			{
-				auto pContentLengthHeader = headers["content-length"];
-				if (pContentLengthHeader) 
+				const char* contentLengthHeaderName = "content-length";
+				if (headers.IsContains(contentLengthHeaderName))
 				{
-					contentLength = pContentLengthHeader->asLongLong();
+					auto& header = headers[contentLengthHeaderName];
+					contentLength = header.asLongLong();
 					pos += 4;
 				}
 				else 

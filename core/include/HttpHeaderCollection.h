@@ -11,13 +11,17 @@ class DLLEXPORTED HttpHeaderCollection
 private:
 	std::vector<HttpHeader*> *m_pHeaders;
 
+private:
+	HttpHeader* TryGet(const char* name) const;
+
 public:
 	HttpHeaderCollection();
 	HttpHeaderCollection(const HttpHeaderCollection& copy);
 	~HttpHeaderCollection();
 	void AddHeader(const HttpHeader& header);
 	void AddHeader(const char* name, const char* value);
-	const HttpHeader* operator[](const char* name);
+	HttpHeader& operator[](const char* name);
+	bool IsContains(const char* name);
 };
 
 
