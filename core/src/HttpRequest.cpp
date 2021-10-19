@@ -3,52 +3,19 @@
 
 
 HttpRequest::HttpRequest(
+	const HttpHeaderCollection& headers,
 	const std::string& method,
 	const std::string& uri,
 	const std::string& protocolName,
 	const std::string& protocolVersion,
-	const HttpHeaderCollection& headers,
-	const std::string& content,
-	size_t body_begin,
-	size_t contentLen)
+	const std::string& body) :
+	m_pHeaders(headers),
+	m_sMethod(method),
+	m_sUri(uri),
+	m_sProtocolName(protocolName),
+	m_sProtocolVersion(protocolVersion),
+	m_sBody(body)
 {
-	size_t len;
-
-	len = method.size() + 1;
-	m_pszMethod = new char[len];
-	strcpy_s((char*)m_pszMethod, len, method.data());
-
-	len = uri.size() + 1;
-	m_pszUri = new char[len];
-	strcpy_s((char*)m_pszUri, len, uri.data());
-
-	len = protocolName.size() + 1;
-	m_pszProtocolName = new char[len];
-	strcpy_s((char*)m_pszProtocolName, len, protocolName.data());
-
-	len = protocolName.size() + 1;
-	m_pszProtocolVersion = new char[len];
-	strcpy_s((char*)m_pszProtocolVersion, len, protocolVersion.data());
-
-	m_pHeaders = new HttpHeaderCollection(headers);
-
-	m_pszBody = nullptr;
-	if (contentLen > 0)
-	{
-		len = contentLen + 1;
-		m_pszBody = new char[len];
-		strcpy_s((char*)m_pszBody, len,  protocolVersion.data() + body_begin);
-	}
-}
-
-HttpRequest::~HttpRequest()
-{
-	SafeReleasePonter(m_pszBody);
-	SafeReleasePonter(m_pszMethod);
-	SafeReleasePonter(m_pszUri);
-	SafeReleasePonter(m_pszProtocolName);
-	SafeReleasePonter(m_pszProtocolVersion);
-	SafeReleasePonter(m_pHeaders);
 }
 
 size_t HttpRequest::ParseItem(

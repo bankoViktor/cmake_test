@@ -20,8 +20,8 @@ public:
 	static bool CloseSocket(SOCKET socket);
 	static SOCKET Accept(SOCKET socket, SOCKET* pClientSocket);
 
-	// HTTP кодировка		ISO-8859-1
-	// HTTP кодировка тела	Content-Type или ISO-8859-1
+	// HTTP РєРѕРґРёСЂРѕРІРєР°		ISO-8859-1
+	// HTTP РєРѕРґРёСЂРѕРІРєР° С‚РµР»Р°	Content-Type РёР»Рё ISO-8859-1
 
 	static bool Receive(SOCKET socket, std::string& received);
 	//static void Transmit(const char* data, size_t size);

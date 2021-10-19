@@ -86,11 +86,6 @@ void HttpInterface::RequestHandler(SOCKET clientSocket)
 			return;
 		}
 
-		std::string out = "-- received ";
-		out += std::to_string(received.size());
-		out += " bytes\n";
-		OutputDebugStringA(out.data());
-
 		content.append(received);
 
 		if (pos == std::string::npos)
@@ -108,6 +103,7 @@ void HttpInterface::RequestHandler(SOCKET clientSocket)
 				}
 				else 
 				{
+					content.clear();
 					break;
 				}
 			}
@@ -118,24 +114,25 @@ void HttpInterface::RequestHandler(SOCKET clientSocket)
 			size_t loadedContentLength = content.size() - pos;
 			if (loadedContentLength >= contentLength)
 			{
+				content.erase(0, content.size() - contentLength);
 				break;
 			}
 		}
 	}
 
-	HttpRequest request(method, uri, protocolName, protocolVersion, headers, content, pos, contentLength);
+	HttpRequest request(headers, method, uri, protocolName, protocolVersion, content);
+
 	HttpResponse response(request);
 
 	auto it = m_pRequestHandlers->cbegin();
 	while (it != m_pRequestHandlers->cend())
 	{
-		if (StringCompare(it->pszMethod, request.m_pszMethod, true) && 
-			StringCompare(it->pszResource, request.m_pszUri, true))
+		if (StringCompare(it->pszMethod, request.m_sMethod.c_str(), true) && 
+			StringCompare(it->pszResource, request.m_sUri.data(), true))
 		{
 			it->handler(request, response);
 			break;
 		}
-
 		++it;
 	}
 }

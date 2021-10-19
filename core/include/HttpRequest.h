@@ -10,24 +10,21 @@
 class DLLEXPORTED HttpRequest
 {
 public:
-	const char * m_pszMethod;
-	const char * m_pszUri;
-	const char * m_pszProtocolName;
-	const char * m_pszProtocolVersion;
-	HttpHeaderCollection* m_pHeaders;
-	const char* m_pszBody;
+	const HttpHeaderCollection& m_pHeaders;
+	const std::string& m_sMethod;
+	const std::string& m_sUri;
+	const std::string& m_sProtocolName;
+	const std::string& m_sProtocolVersion;
+	const std::string& m_sBody;
 
 public:
 	HttpRequest(
+		const HttpHeaderCollection& headers,
 		const std::string& method,
 		const std::string& uri,
 		const std::string& protocolName,
 		const std::string& protocolVersion,
-		const HttpHeaderCollection& headers,
-		const std::string& content,
-		size_t body_begin,
-		size_t contentLen);
-	~HttpRequest();
+		const std::string& body);
 	static bool Parse(
 		const std::string& content,
 		size_t end,
