@@ -6,7 +6,7 @@
 #include <sstream>
 
 
-#define RX_BUFFER_SIZE		512 * 1 // 512KB
+#define RX_BUFFER_SIZE			512 // 512KB
 
 
 class DLLEXPORTED WinSock
@@ -26,7 +26,7 @@ public:
 	// HTTP кодировка тела	Content-Type или ISO-8859-1
 
 	static bool Receive(SOCKET socket, std::string& received);
-	//static void Transmit(const char* data, size_t size);
+	static bool Transmit(SOCKET socket, const std::string& content);
 };
 
 

@@ -9,7 +9,10 @@
 class DLLEXPORTED HttpHeaderCollection
 {
 private:
-	std::vector<HttpHeader*> *m_pHeaders;
+	using HeadersVector = std::vector<HttpHeader*>;
+
+private:
+	HeadersVector*m_pHeaders;
 
 private:
 	HttpHeader* TryGet(const char* name) const;

@@ -14,10 +14,10 @@ typedef struct _REQUEST_HANDLER_INFO
 	const char* pszMethod;
 	const char* pszResource;
 	REQUEST_HANDLER handler;
+	const void* reserved;
 } REQUEST_HANDLER_INFO;
 
-
-typedef std::vector<REQUEST_HANDLER_INFO> HttpHandlerCollection;
+using HttpHandlerCollection = std::vector<REQUEST_HANDLER_INFO>;
 
 
 #endif // !_TYPES_H

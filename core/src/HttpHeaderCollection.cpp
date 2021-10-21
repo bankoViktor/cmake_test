@@ -4,7 +4,7 @@
 
 HttpHeaderCollection::HttpHeaderCollection()
 {
-	m_pHeaders = new std::vector<HttpHeader*>();
+	m_pHeaders = new HeadersVector();
 }
 
 HttpHeaderCollection::HttpHeaderCollection(const HttpHeaderCollection& copy) :

@@ -91,7 +91,9 @@ void HttpInterface::RequestHandler(SOCKET clientSocket)
 		++it;
 	}
 
-	//if (!Transmit(clientSocket, response)) return;
+	if (!Transmit(clientSocket, response)) return;
+
+	WinSock::CloseSocket(clientSocket);
 
 	std::cout 
 		<< std::setfill('.') 
@@ -167,7 +169,7 @@ bool HttpInterface::Transmit(
 	SOCKET socket,
 	const HttpResponse& response)
 {
-	std::cout << "Error Transmit NOT IMPLEMENTED" << std::endl;
+	std::stringstream ss;
 
-	return false;
+	return response.WriteData(ss) && WinSock::Transmit(socket, ss.str());
 }

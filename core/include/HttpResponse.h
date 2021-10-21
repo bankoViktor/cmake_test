@@ -2,8 +2,11 @@
 #define _HTTP_RESPONSE_H
 
 #include "HttpRequest.h"
+#include "HttpHeaderCollection.h"
 #include "export.h"
 #include <string>
+#include <memory>
+#include <sstream>
 
 
 typedef enum class _HttpStatusCodes
@@ -87,19 +90,23 @@ typedef enum class _HttpStatusCodes
 class DLLEXPORTED HttpResponse
 {
 private:
-	const HttpRequest& m_request;
+	const HttpRequest* m_pRequest;
+	const char* m_pBody;
+	std::string* m_psConentType;
 	unsigned int m_nStatusCode;
-	const char* m_pszBody;
 
 public:
 	HttpResponse(const HttpRequest &request);
 	~HttpResponse();
-	void Write(const char * content);
+	void Write(const char* content, const char* conentType);
+	void Write(const std::string& content, const std::string& conentType);
 	void SetStatusCode(HttpStatusCodes statusCode);
 	void SetStatusCode(unsigned int statusCode);
 	unsigned int GetStatusCode() const;
-	const HttpRequest& GetRequest() const;
+	const HttpRequest* GetRequest() const;
 	static const char* TranslateStatusCode(HttpStatusCodes status);
+
+	bool WriteData(std::stringstream& ss) const;
 };
 
 

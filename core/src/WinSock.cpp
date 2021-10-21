@@ -145,3 +145,25 @@ bool WinSock::Receive(SOCKET socket, std::string& received)
 
 	return true;
 }
+
+bool WinSock::Transmit(SOCKET socket, const std::string& content)
+{
+	size_t sendedBytes = 0;
+	size_t contentSize = content.size();
+	auto buffer = content.c_str();
+
+	while (sendedBytes < contentSize)
+	{
+		sendedBytes = (size_t)send(socket, buffer + sendedBytes, contentSize - sendedBytes, NULL);
+		if (sendedBytes > 0)
+		{
+
+		}
+		else if (sendedBytes < 0)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}

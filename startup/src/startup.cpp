@@ -5,7 +5,8 @@
 
 void indexWithRouteParamHandler(const HttpRequest& req, HttpResponse& resp)
 {
-	std::cout << req.m_sMethod << "   " << req.m_sUri << "     " << " index page content " << std::endl;
+	resp.SetStatusCode(HttpStatusCodes::NotFound);
+	resp.Write("Document Not Found", "text/html");
 }
 
 void Startup(HttpInterfaceConfigurator& config)
@@ -13,7 +14,8 @@ void Startup(HttpInterfaceConfigurator& config)
 	// Прямое указания стандартного метода HTTP
 	config.on(HttpMethods::Get, "/", [](const HttpRequest& req, HttpResponse& resp)
 		{
-			resp.Write("<!DOCTYPE><html lang=\"en\"><head><title>Test page</title></head><body><h2>Test page</h2><body></html>");
+			auto payload = "<!DOCTYPE><html lang=\"en\"><head><title>Test page</title></head><body><h2>Test page</h2></body></html>";
+			resp.Write(payload, "text/html");
 		}
 	);
 
@@ -24,5 +26,5 @@ void Startup(HttpInterfaceConfigurator& config)
 		}
 	);
 
-	config.get("/index/{id}", indexWithRouteParamHandler);
+	config.post("/index", indexWithRouteParamHandler);
 }

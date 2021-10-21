@@ -2,25 +2,35 @@
 #include "../include/Utils.h"
 
 
-HttpResponse::HttpResponse(const HttpRequest& request) :
-	m_request(request)
+HttpResponse::HttpResponse(const HttpRequest& request)
 {
-	m_pszBody = nullptr;
+	m_pRequest = &request;
+	m_pBody = nullptr;
 	m_nStatusCode = (unsigned int)HttpStatusCodes::OK;
+	m_psConentType = new std::string();
 }
 
 HttpResponse::~HttpResponse()
 {
-	SafeReleasePonter(m_pszBody);
+	SafeReleasePonter(m_pBody);
+	SafeReleasePonter(m_psConentType);
 }
 
-void HttpResponse::Write(const char* content)
+void HttpResponse::Write(const char* content, const char* conentType)
 {
-	SafeReleasePonter(m_pszBody);
+	// Body
+	SafeReleasePonter(m_pBody);
+	size_t len = strlen(content) + 1;
+	m_pBody = new char[len];
+	strcpy_s((char*)m_pBody, len, content);
 
-	auto len = strlen(content) + 1;
-	m_pszBody = new char[len];
-	strcpy_s((char*)m_pszBody, len, content);
+	// content type
+	*m_psConentType = conentType;
+}
+
+void HttpResponse::Write(const std::string& content, const std::string& conentType)
+{
+	Write(content.c_str(), conentType.c_str());
 }
 
 void HttpResponse::SetStatusCode(HttpStatusCodes statusCode)
@@ -38,9 +48,9 @@ unsigned int HttpResponse::GetStatusCode() const
 	return m_nStatusCode;
 }
 
-const HttpRequest& HttpResponse::GetRequest() const
+const HttpRequest* HttpResponse::GetRequest() const
 {
-	return m_request;
+	return m_pRequest;
 }
 
 const char* HttpResponse::TranslateStatusCode(HttpStatusCodes status)
@@ -120,7 +130,39 @@ const char* HttpResponse::TranslateStatusCode(HttpStatusCodes status)
 	case HttpStatusCodes::NotExtended:						return "Not Extended";
 	case HttpStatusCodes::NetworkAuthenticationRequired:	return "Network Authentication Required";
 	default:
-		// TODO CALLBACK метод перевода пользовательских кодов состояний
+		// TODO CALLBACK РјРµС‚РѕРґ РїРµСЂРµРІРѕРґР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… РєРѕРґРѕРІ СЃРѕСЃС‚РѕСЏРЅРёР№
 		return "";
 	}
+}
+
+bool HttpResponse::WriteData(std::stringstream& ss) const
+{
+	ss.clear();
+	
+	// Head
+	ss
+		<< m_pRequest->m_sProtocolName << '/' << m_pRequest->m_sProtocolVersion << ' '
+		<< m_nStatusCode << ' '
+		<< TranslateStatusCode((HttpStatusCodes)m_nStatusCode)
+		<< "\r\n";
+
+	// Headers
+	ss
+		<< "Connection" << ": " << "Closed" << "\r\n";
+	
+	// Payload
+	if (m_pBody)
+	{
+		auto len = strlen(m_pBody);
+		if (len > 0)
+		{
+			ss
+				<< "Content-Length: " << len << "\r\n"
+				<< "Content-Type: " << m_psConentType->c_str() << "\r\n"
+				<< "\r\n"
+				<< m_pBody;
+		}
+	}
+
+	return true;
 }
